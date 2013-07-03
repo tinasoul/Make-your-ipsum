@@ -8,6 +8,7 @@ require 'twitter'
 class Ipsum
  
 @@dummy_ipsum= []
+@@opti_ipsum = ["everything's gonna be all right", "look up", "get that dirt of your shoulders"]
 @@sentences_per_paragraph = 4
  
  def self.configure
@@ -21,21 +22,31 @@ class Ipsum
  
   def self.clean_tweet(tweet)
   # puts tweet.text.class
-  # text is a twitter method to get full tweet/ after cycling through the array
-  # in self.search_twitter we are left with strings  
+  # text is a twitter method to get full tweet/ after cycling through the array in twitter.search
   twitter_strings = tweet.text.split(" ")
-  #split words out so I can reject a few
+  #split words out of tweet full text so I can reject a few words. Reject just deletes. 
   twitter_strings.reject! do |word|
-        word.include?("#") or word.include?("RT") or word.include?("http") or word.include?("@") or word.include?("&lt") or word.include?("&gt")or word.include?("&amp") 
+        word.include?("#") or word.include?("RT") or word.include?("http:") or word.include?("@") or word.include?("&lt") or word.include?("&gt")or word.include?("&amp") 
       end
-  scrubbed_twitter_strings = twitter_strings.gsub(/\\U\+\S*/,"") #remove emojis   
-  merged_twitter_string = scrubbed_twitter_strings.join(" ")
-  #joined words back together into full strings
+  scrubbed_twitter_strings = twitter_strings.gsub!(/\\U\+\S*/,"") #remove emojis   
+  merged_twitter_strings = scrubbed_twitter_strings.join(" ")
+  #joined words back together into full tweets
+  merged_twitter_strings
   end
  
+  def self.push_tweet
+     @@dummy_ipsum << self.clean_tweet(tweet)
+  end
+
+  # def check_tweet
+  #   if self.search_twitter.empty? do
+  #   puts "No results right now. Search for so" 
+  #   end
+
+  end
+
   def self.search_twitter
     Twitter.search(@@hashtag_request, :count => 10000).results.each do |tweet| #how do we include all tweets without setting a max count
-    @@dummy_ipsum << self.clean_tweet(tweet)
     end
   end
  
@@ -52,7 +63,22 @@ class Ipsum
        @paragraph = make_sentence
      end
      print @paragraph
-   end  
+   end
+
+  #   def self.make_opti_sentence
+  #   raw_array = @@opti_ipsum.sample(rand(5..7))
+  #   last_array_item = raw_array.last
+  #       if last_array_item.include?(".") or last_array_item.include?("?") or last_array_item.include?("!") or last_array_item.include?("...")
+  #       punc_last_array_item = last_array_item + " "
+  #       else
+  #       punc_last_array_item = last_array_item + ". "
+  #       end
+  #   raw_array.pop
+  #   revised_array = raw_array << punc_last_array_item
+  #   raw_sentence = revised_array.join(" ")
+  #   cap_sentence = raw_sentence.capitalize
+  #   print cap_sentence
+  # end
 
   def self.make_sentence
     raw_array = @@dummy_ipsum.sample(rand(5..7))
@@ -80,12 +106,19 @@ class Ipsum
     @@number_of_paras = gets.chomp.to_i
     puts
   end
+
+  # def self.execute_opti_ipsum
+  #   self.make_opti_sentence
+  #   self.make_para
+
+  # end
  
   def self.execute
     self.configure
     puts "\nWelcome to Make Your Ipsum.\n\n"
     self.get_hashtag
     self.search_twitter
+    self.push_tweet
     puts
     self.get_para_count
     self.make_block
