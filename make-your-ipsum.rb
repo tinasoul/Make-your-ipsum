@@ -1,16 +1,10 @@
-#Todo
-
-#get self.clean_tweet to work (e.g. remove emojis)
-#consolidate make_sentence method
-
 require 'twitter'
 
 class Ipsum
- 
   @@dummy_ipsum= []
-  @@opti_ipsum = ["everything's gonna be all right", "look up", "get that dirt of your shoulders"]
+  @@opti_ipsum = ["everything's gonna be all right", "look up", "smiley"]
+  @@paragraphs_for_opti_block = 5
   @@sentences_per_paragraph = 4
-  @@paragraphs_per_block = 5
  
   def self.configure
     Twitter.configure do |config|
@@ -21,51 +15,34 @@ class Ipsum
     end
   end
  
-  def self.clean_tweet(tweet)
-  # puts tweet.text.class
-  # text is a twitter method to get full tweet/ after cycling through the array in twitter.search
-    twitter_strings = tweet.text.split(" ")
-    #split words out of tweet full text so I can reject a few words. Reject just deletes. 
-    twitter_strings.reject! do |word|
-      word.include?("#") or word.include?("RT") or word.include?("http:") or word.include?("@") or word.include?("&lt") or word.include?("&gt")or word.include?("&amp") 
-    end
-    scrubbed_twitter_strings = twitter_strings.gsub!(/\\U\+\S*/,"") #remove emojis   
-    merged_twitter_strings = scrubbed_twitter_strings.join(" ")
-    #joined words back together into full tweets
-    merged_twitter_strings
-  end
- 
-  def self.push_tweet
-     @@dummy_ipsum << self.clean_tweet(tweet)
+  def self.push_tweets
+     @@dummy_ipsum << @@clean_tweet
   end
 
-  def self.check_tweet
-    if self.search_twitter.empty? 
-    # puts "No results right now so we've loaded some opti_ipsum for you!"
+  def self.check_tweets
+    if @@tweet.empty? 
+      puts "No results right now so we've loaded some opti_ipsum for you!"
       self.execute.opti_ipsum
-    else
-      @@search_results.map! do |tweet|
-        self.clean_tweet(tweet)
-      end
     end
   end
 
   def self.search_twitter
-    Twitter.search(@@hashtag_request, :count => 10000).results.each do |tweet| #how do we include all tweets without setting a max count
+    scrubbed_array = []
+    Twitter.search(@@hashtag_request, :count => 10000).results.map do |object| 
+     @@tweet = object.full_text #strings
     end
-  end
-
-  def self.execute
-    Twitter.search(@@hashtag_request, :count => 10000).results.each do |tweet| #how do we include all tweets without setting a max count
+     word_array = @@tweet.split(" ") #an array of words in each tweet
+      word_array.reject! do |word| 
+        word.include?("#") or word.include?("RT") or word.include?("http:") or word.include?("@") or word.include?("&lt") or word.include?("&gt")or word.include?("&amp") 
+      end
+    word_array.each do |word|   
+      scrubbed_array <<  word.gsub(/\\U\+\S*/,"") #remove emojis 
     end
-
-    @@search_results = Twitter.search(...)
-    check_tweets(@@search)
-
+    @@clean_tweet = scrubbed_array.join(" ") #clean_tweet is a string
   end
 
   def self.make_fixed_block
-    @@paragraphs_per_block.times do 
+    @@paragraphs_for_opti_block.times do 
       @block = make_para
       puts "\n\n"
     end
@@ -84,17 +61,17 @@ class Ipsum
     @@sentences_per_paragraph.times do
       @paragraph = make_sentence
     end
-      print @paragraph
+    print @paragraph
   end
 
   def self.make_opti_sentence
     raw_array = @@opti_ipsum.sample(rand(5..7))
     last_array_item = raw_array.last
-    if last_array_item.include?(".") or last_array_item.include?("?") or last_array_item.include?("!") or last_array_item.include?("...")
+      if last_array_item.include?(".") or last_array_item.include?("?") or last_array_item.include?("!") or last_array_item.include?("...")
       punc_last_array_item = last_array_item + " "
-    else
+      else
       punc_last_array_item = last_array_item + ". "
-    end
+      end
     raw_array.pop
     revised_array = raw_array << punc_last_array_item
     raw_sentence = revised_array.join(" ")
@@ -141,8 +118,8 @@ class Ipsum
     puts "\nWelcome to Make Your Ipsum.\n\n"
     self.get_hashtag
     self.search_twitter
-    self.check_tweet
-    self.push_tweet
+    self.check_tweets
+    self.push_tweets
     puts
     self.get_para_count
     self.make_block
