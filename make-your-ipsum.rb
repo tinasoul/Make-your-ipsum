@@ -26,6 +26,7 @@ class Ipsum
     end
   end
 
+
   def self.search_twitter
     scrubbed_array = []
     Twitter.search(@@hashtag_request, :count => 10000).results.map do |object| 
@@ -130,17 +131,3 @@ end
 Ipsum.execute
 
 
-# def self.search_twitter
-#   @@results = Twitter.search(...)
-# end
-
-# def self.clean_tweet
-#   if @@results.map
-# end
-# if results.empty?
-#   ...
-# else
-#   results.map do |tweet|
-#     tweet.gsub()
-#   end
-# end
