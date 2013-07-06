@@ -19,7 +19,7 @@ class Ipsum
 
 
   def self.search_twitter
-    @@tweet_messages_array = Twitter.search(@@hashtag_request, :count => 10000).results.collect do |tweet| 
+    @@tweet_messages_array = Twitter.search(@@hashtag_request, :count => 5000).results.collect do |tweet| 
       tweet.full_text 
     end
   end
@@ -72,15 +72,20 @@ class Ipsum
     @@hashtag_request = gets.chomp
   end
  
+  def self.prompt
+    puts "\nWelcome to Make Your Ipsum.\n\n"
+  end
+
 
   def self.execute_opti_ipsum
     @@tweet_messages_array = @@opti_ipsum
-    self.make_block(@@paragraphs_for_opti_block)
+    make_block(@@paragraphs_for_opti_block)
   end
+
  
   def self.execute
     configure
-    puts "\nWelcome to Make Your Ipsum.\n\n"
+    prompt
     get_hashtag
     search_twitter
 
@@ -95,9 +100,26 @@ class Ipsum
     end
   end
 
+# -------------Run Opti_Ipsum only-------------
+  def self.get_opti_para_count
+    puts "\nThank ya much. How many paragraphs of Opti-Ipsum do you want?"
+    @@number_of_paras = gets.chomp.to_i
+    puts
+  end
+
+  def self.opti_prompt
+    puts "\nWelcome to Opti-Ipsum. Ipsum to brighten your day!\n\n"
+  end
+
+  def self.execute_opti_ipsum_only
+    @@tweet_messages_array = @@opti_ipsum
+    opti_prompt
+    get_opti_para_count
+    make_block(@@paragraphs_for_opti_block)
+  end
+#------------------------------------------------
   private
 
-  # Remove 
   def self.clean_tweets
     @@tweet_messages_array.collect! do |tweet_message|
       approved_words_array = tweet_message.split(" ").reject! do |word| 
@@ -110,6 +132,7 @@ class Ipsum
  
 end
 
-Ipsum.execute
+# Ipsum.execute
+Ipsum.execute_opti_ipsum_only
 
 
