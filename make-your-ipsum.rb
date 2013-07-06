@@ -1,9 +1,12 @@
 require 'twitter'
 
 class Ipsum
-  @@opti_ipsum = ["everything's gonna be all right", "look up", "smiley"]
-  @@paragraphs_for_opti_block = 5
-  @@sentences_per_paragraph = 8
+  @@opti_ipsum = ["Don't worry about a thing", "Cause every little thing gonna be all right.", "Rise up this mornin'", "Smiled with the risin' sun", "Three little birds","On your doorstep", "Singin' sweet songs", "Of melodies pure and true", "Sayin', This is my message to you-ou-ou","Tupac cares if don't nobody else care", "But please don't cry, dry your eyes, never let up" "Forgive but don't forget, girl keep your head up", "And when he tells you you ain't nuttin don't believe him", "Keep ya head up, oooo child things are gonna get easier", "And it's crazy, it seems it'll never let up, but please... you got to keep your head up", "Here comes the sun (doo doo doo doo)","Little darling, the smiles returning to the faces","It's all right", "Just dance, gonna be okay, da da doo-doo-mmm", "Just dance, spin that record babe, da da doo-doo-m", "Let it go", "Feel free right now, go do what you wanna do", "Can’t let nobody take it away from you, from me, from we","No time for moping around, are you kidding?","And no time for negative vibes 'cause I’m winning", "It’s been a long week, I put in my hardest", "Gonna live my life, feels so good to get it right", "So I like what I see when I’m looking at me when I’m walking past the mirror", "Got my head on straight, I got my vibe right", "See I wouldn’t change my life, my life’s just fine", "Get, that, dirt off your shoulder", "Big wheel keep on turnin'", "Proud mary keep on burning", "Wake up everybody", "No more sleepin' in bed", "No more backward thinkin'", "Time for thinkin' ahead", "Wake up, all the builders", "Time to build a new land", "I know we can do it", "If we all lend a hand"]
+  #bob marley, tupac, beatles, lady gaga, mary j blige, jay-z, tina turner, john legend
+
+
+  @@paragraphs_for_opti_block = 3
+  @@sentences_per_paragraph = 4
  
   def self.configure
     Twitter.configure do |config|
@@ -41,7 +44,7 @@ class Ipsum
   def self.make_sentence(messages_array = nil)
     messages_array ||= @@tweet_messages_array
 
-    raw_array = messages_array.sample(rand(1..3))
+    raw_array = messages_array.sample(rand(5..7))
     last_array_item = raw_array.last
 
     if last_array_item.include?(".") or last_array_item.include?("?") or last_array_item.include?("!") or last_array_item.include?("...")
@@ -59,13 +62,13 @@ class Ipsum
   end
 
   def self.get_para_count
-    puts "Thank ya much. How many paragraphs of #{@@hashtag_request} do you want?"
+    puts "\nThank ya much. How many paragraphs of #{@@hashtag_request} do you want?"
     @@number_of_paras = gets.chomp.to_i
     puts
   end
 
   def self.get_hashtag
-    puts "Type in twitter hashtag or user handle (including the # or @ symbol), and we'll build a custom ipsum!"
+    puts "Type in twitter hashtag or user handle (including the # or @ symbol), and we'll build a custom ipsum!\n\n"
     @@hashtag_request = gets.chomp
   end
  
@@ -83,7 +86,7 @@ class Ipsum
 
 
     if @@tweet_messages_array.empty?
-      puts "No results right now, so here's some ipsum anyway!"
+      puts "\nNo results right now, so here's some opti-ipsum to brighten your day!\n\n"
       execute_opti_ipsum
     else
       clean_tweets
